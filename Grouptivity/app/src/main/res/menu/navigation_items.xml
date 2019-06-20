@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/my_events"
+            android:orderInCategory="0"
+            android:icon="@drawable/ic_event"
+            android:title="My Events" />
+        <item
+            android:id="@+id/my_account"
+            android:orderInCategory="0"
+            android:icon="@drawable/ic_me"
+            android:title="My Account" />
+        <item
+            android:id="@+id/groups"
+            android:orderInCategory="0"
+            android:icon="@drawable/ic_parties"
+            android:title="Groups" />
+        <item
+            android:id="@+id/sign_out"
+            android:orderInCategory="0"
+            android:icon="@drawable/ic_sign_out"
+            android:title="Sign Out" />
+    </group>
+
+    <item
+        android:id="@+id/my_groups"
+        android:title="My Groups">
+        <menu
+            android:id="@+id/groups_menu">
+            <group
+                android:id="@+id/groups_menu_group"
+                android:checkableBehavior="single"/>
+        </menu>
+    </item>
+
+</menu>

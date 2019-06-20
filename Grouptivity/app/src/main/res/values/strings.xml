@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Grouptivity</string>
+    <string name="event_title_label">Event Title</string>
+    <string name="event_type_label">Event Type</string>
+    <string name="event_date_and_time_label">Date &amp; Time</string>
+    <string name="flex_date">Flex Date</string>
+    <string name="event_location_label">Location</string>
+    <string name="location_detail_button">Detail</string>
+    <string name="update_event">Update</string>
+    <string name="attribute_title_label">Attribute Title</string>
+    <string name="attribute_value">Attribute Value</string>
+    <string name="create_attribute_title">New Attribute</string>
+    <string name="update_attribute_title">Update Attribute</string>
+    <string name="delete">Delete</string>
+</resources>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "839467755245",
+    "firebase_url": "https://grouptivity-25638.firebaseio.com",
+    "project_id": "grouptivity-25638",
+    "storage_bucket": "grouptivity-25638.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:839467755245:android:6608fd254971e13f",
+        "android_client_info": {
+          "package_name": "com.ahwers.grouptivity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "839467755245-sq34qc881jce7dm7ah0bgrr4ktqv8703.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ahwers.grouptivity",
+            "certificate_hash": "b5e13bba29a3b6417b55e57612b0bd0125ae8460"
+          }
+        },
+        {
+          "client_id": "839467755245-qft7ubr3752j50hvfkht1jl8o40a6rho.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4xCOQRCGB5eQzYkphwa-4OezXLHmP9R8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "839467755245-qft7ubr3752j50hvfkht1jl8o40a6rho.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
