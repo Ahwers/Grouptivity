@@ -42,6 +42,8 @@ public class EventRepository {
     public static final Integer SAVE_FAILED = 0;
     public static final Integer SAVE_SUCCESS = 1;
 
+    protected String mNewEventId;
+
     private ListenerRegistration mEventListener;
     private FirebaseFirestore mDb;
 
@@ -242,6 +244,7 @@ public class EventRepository {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
+                        mNewEventId = documentReference.getId();
                         data.setValue(1);
                     }
                 })
@@ -253,6 +256,10 @@ public class EventRepository {
                 });
 
         return data;
+    }
+
+    public String getNewEventId() {
+        return mNewEventId;
     }
 
     public LiveData<Integer> setAvailability(List<OpenDateAvailability> availabilityList, String userId, String eventId) {

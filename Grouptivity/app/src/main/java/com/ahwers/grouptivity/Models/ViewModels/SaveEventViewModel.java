@@ -9,6 +9,7 @@ import com.ahwers.grouptivity.Models.ExtraAttribute;
 import com.ahwers.grouptivity.Models.Group;
 import com.ahwers.grouptivity.Models.Repositories.EventRepository;
 import com.ahwers.grouptivity.Models.Repositories.GroupRepository;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.Date;
 import java.util.List;
@@ -60,6 +61,10 @@ public class SaveEventViewModel extends ViewModel {
 
     public void startListening() {
         mListening = true;
+        if (mEventId == null) {
+            mEventId = mEventRepository.getNewEventId();
+        }
+
         mEvent = mEventRepository.getEventListener(mEventId);
     }
 
