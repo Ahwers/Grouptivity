@@ -111,6 +111,10 @@ public class SaveEventViewModel extends ViewModel {
         return mRollbackState;
     }
 
+    public boolean isEventBeingEdited() {
+        return mEvent.getValue().isEditing();
+    }
+
     public void setEventTitle(String title) {
         mEvent.getValue().setTitle(title);
     }

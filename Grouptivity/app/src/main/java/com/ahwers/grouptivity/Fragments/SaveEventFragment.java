@@ -70,7 +70,6 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
     private boolean mEditing;
     private boolean mEditable = false;
     private boolean mNewEvent = false;
-    private boolean mStaleData;
 
     // Inject as singleton
     private EventPresenter mEventPresenter;
@@ -119,8 +118,6 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
     private void initEventObserver() {
         mSaveEventViewModel.getEvent().observe(this, mEvent -> {
-//                if (mEvent != null) {
-//                }
             try {
                 updateUi(mEvent);
             } catch (IllegalArgumentException e) {
@@ -263,6 +260,50 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case R.id.edit_event_button:
+                if (!mSaveEventViewModel.isEventBeingEdited()) {
+                    setEditing(true);
+                } else {
+                    // Snackbar telling the user to wait until their group mate has finished editing the event
+                }
+                break;
+            case R.id.stop_editing_buton:
+                setEditing(false);
+                break;
+            case R.id.save_event_button:
+                saveEvent();
+                break;
+        }
+    }
+
+    private void makeASnack(String snackMessage, View.OnClickListener snackAction, String snackActionName) {
+        if (snackMessage == null) {
+            throw new IllegalArgumentException("A snack needs a message.");
+        } else if (snackAction != null && snackActionName == null) {
+            throw new IllegalArgumentException("A snack action requires a name.");
+        } else if (snackAction == null && snackActionName != null) {
+            throw new IllegalArgumentException("A snack action name requires an action.");
+        }
+
+        Snackbar snack = Snackbar.make(mSnackbarContext, snackMessage, Snackbar.LENGTH_LONG);
+        if (snackAction != null) {
+            snack.setAction(snackActionName, snackAction);
+        }
+        snack.show();
+    }
+
+    public void makeASnack(String snackMessage) {
+        if (snackMessage == null) {
+            throw new IllegalArgumentException("A snack needs a message.");
+        }
+
+        Snackbar.make(mSnackbarContext, snackMessage, Snackbar.LENGTH_LONG)
+                .show();
+    }
+
     /**
      * Sets the event's editing state and updates the UI accordingly.
      *
@@ -273,7 +314,10 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
         mEditing = editing;
 
-        mSaveEventViewModel.updateEventEditingState(mEditing);
+        // Don't update the editing state if the user has just loaded the event
+        if (!isLoading()) {
+            mSaveEventViewModel.updateEventEditingState(mEditing);
+        }
 
         if (mEditable) {
             if (mNewEvent) {
@@ -303,21 +347,6 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         setEditTextEditable(mLocationEditText, mEditing);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch(v.getId()) {
-            case R.id.edit_event_button:
-                setEditing(true);
-                break;
-            case R.id.stop_editing_buton:
-                setEditing(false);
-                break;
-            case R.id.save_event_button:
-                saveEvent();
-                break;
-        }
-    }
-
     /**
      * Updates the fragment's views and editable state based off of the updated event data.
      *
@@ -332,26 +361,31 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
         // If the trigger is simply the user editing the event, no need to update the whole UI unless this is the first call
         if (mEditing == mSaveEventViewModel.getEvent().getValue().isEditing()
+                && event.getUpdateSource().equals(Event.UPDATE_SOURCE_LOCAL)
                 && !isLoading()) {
             return;
+        }
+
+        if (event.isEditing() && !mEditing) {
+            // Display a message saying that a member is editing
+            // Maybe say who it is
         }
 
         // Updates the editable state of the UI based on the event data
         updateEditState(event);
 
         // Displays a message to the user if another user has updated the event
-        if (!mNewEvent && event.getUpdateSource().equals(Event.UPDATE_SOURCE_SERVER)) {
-            displayDataUpdatedMessage(event);
+        if (!mNewEvent
+                && event.getUpdateSource().equals(Event.UPDATE_SOURCE_SERVER)
+                && !isLoading()) {
+
+            // Maybe say which user updated the event
+            makeASnack("Event has just been updated");
+
+            // Highlight the views of the data that was updated
         }
 
-        // Only update the data if the current user isn't currently modifying the data
-        // mStaleData allows the system to update to the updated data if the current user cancels their update
-        if (!mEditing) {
-            setUiValues(event);
-            mStaleData = false;
-        } else {
-            mStaleData = true;
-        }
+        setUiValues(event);
 
         setLoading(false);
     }
@@ -439,7 +473,7 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
                             initEventObserver();
                         } else {
                             Snackbar.make(mSnackbarContext, "Event saved", Snackbar.LENGTH_LONG)
-                                    .setAction("Undo", v -> rollbackSave())
+//                                    .setAction("Undo", v -> rollbackSave())
                                     .show();
                         }
                         setEditing(false);
@@ -455,26 +489,26 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
     }
 
-    /**
-     * Reverses the changes made to the event to it's previous state.
-     */
-    private void rollbackSave() {
-        mSaveEventViewModel.rollbackSave().observe(this, mRollbackSaveState -> {
-
-            switch (mRollbackSaveState) {
-                case 0:
-                    Snackbar.make(mSnackbarContext, "Undo failed", Snackbar.LENGTH_LONG)
-                            .setAction("Retry", v -> rollbackSave())
-                            .show();
-                    break;
-                case 1:
-                    Snackbar.make(mSnackbarContext, "Save undone", Snackbar.LENGTH_SHORT)
-                            .show();
-                    break;
-            }
-
-        });
-    }
+//    /**
+//     * Reverses the changes made to the event to it's previous state.
+//     */
+//    private void rollbackSave() {
+//        mSaveEventViewModel.rollbackSave().observe(this, mRollbackSaveState -> {
+//
+//            switch (mRollbackSaveState) {
+//                case 0:
+//                    Snackbar.make(mSnackbarContext, "Undo failed", Snackbar.LENGTH_LONG)
+//                            .setAction("Retry", v -> rollbackSave())
+//                            .show();
+//                    break;
+//                case 1:
+//                    Snackbar.make(mSnackbarContext, "Save undone", Snackbar.LENGTH_SHORT)
+//                            .show();
+//                    break;
+//            }
+//
+//        });
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -531,26 +565,22 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         setUiValues(mSaveEventViewModel.getEvent().getValue());
     }
 
-    /**
-     * Informs the user of real time changes to the event by other members, and updates the rollback event
-     * state if the current user wishes to undo any changes they make.
-     *
-     * @param event
-     * The event the user is viewing.
-     * Holds information about the source of the update.
-     */
-    private void displayDataUpdatedMessage(Event event) {
-        // (If the event is already displayed AND the user has not already been informed of the data change)
-        if (!mTitleEditText.getText().toString().isEmpty()
-                && !mStaleData) {
-            mSaveEventViewModel.setEventRollback(event);
-            // Maybe say which user updated the event
-            Snackbar.make(mSnackbarContext, "Event has just been updated", Snackbar.LENGTH_LONG)
-                    .show();
-
-            // Highlight the views of the data that was updated
-        }
-    }
+//    /**
+//     * Informs the user of real time changes to the event by other members, and updates the rollback event
+//     * state if the current user wishes to undo any changes they make.
+//     *
+//     * @param event
+//     * The event the user is viewing.
+//     * Holds information about the source of the update.
+//     */
+//    private void displayDataUpdatedMessage(Event event) {
+//        // (If the event is already displayed AND the user has not already been informed of the data change)
+//        if (!mTitleEditText.getText().toString().isEmpty()
+//                && !mStaleData) {
+//
+//
+//        }
+//    }
 
     private void setEditTextEditable(EditText editText, boolean editable) {
         editText.setFocusable(editable);
