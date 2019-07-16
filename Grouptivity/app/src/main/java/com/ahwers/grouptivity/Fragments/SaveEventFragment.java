@@ -24,16 +24,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema;
-import com.ahwers.grouptivity.Models.Event;
-import com.ahwers.grouptivity.Models.ExtraAttribute;
-import com.ahwers.grouptivity.Models.OpenDateTime;
+import com.ahwers.grouptivity.Models.DataModels.Event;
+import com.ahwers.grouptivity.Models.DataModels.ExtraAttribute;
+import com.ahwers.grouptivity.Models.DataModels.OpenDateTime;
+import com.ahwers.grouptivity.Models.Presenters.EventPresenter;
 import com.ahwers.grouptivity.Models.ViewModels.SaveEventViewModel;
 import com.ahwers.grouptivity.R;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +72,9 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
     private boolean mNewEvent = false;
     private boolean mStaleData;
 
+    // Inject as singleton
+    private EventPresenter mEventPresenter;
+
     public static SaveEventFragment newInstance(String eventId, String groupId) {
         Log.d(TAG, "newInstance: ");
 
@@ -83,6 +84,10 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
         SaveEventFragment fragment = new SaveEventFragment();
         fragment.setArguments(args);
+
+        // Inject this
+        fragment.setEventPresenter(new EventPresenter());
+
         return fragment;
     }
 
@@ -108,12 +113,22 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
             mNewEvent = true;
             mEditable = true;
         } else {
-            mSaveEventViewModel.getEvent().observe(this, mEvent -> {
-                if (mEvent != null) {
-                    updateUi(mEvent);
-                }
-            });
+            initEventObserver();
         }
+    }
+
+    private void initEventObserver() {
+        mSaveEventViewModel.getEvent().observe(this, mEvent -> {
+//                if (mEvent != null) {
+//                }
+            try {
+                updateUi(mEvent);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                // Create snackbar that alerts user of failed fetch and add try again button
+                // Try again button sets the screen to loading
+            }
+        });
     }
 
     @Override
@@ -127,7 +142,7 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
         mSnackbarContext = view.findViewById(R.id.snackbar_context);
 
-        mTitleEditText = view.findViewById(R.id.event_title);
+        mTitleEditText = view.findViewById(R.id.event_title_edit_text);
         mTitleEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -170,7 +185,7 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
             }
         });
 
-        mDateAndTimeEditText = view.findViewById(R.id.date_and_time_text_view);
+        mDateAndTimeEditText = view.findViewById(R.id.date_edit_text);
         mDateAndTimeEditText.setFocusable(false);
 
         mLocationEditText = view.findViewById(R.id.event_location);
@@ -258,6 +273,8 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
         mEditing = editing;
 
+        mSaveEventViewModel.updateEventEditingState(mEditing);
+
         if (mEditable) {
             if (mNewEvent) {
                 mEditEventButton.hide();
@@ -306,8 +323,18 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
      *
      * @param event The event data to update the UI with.
      */
-    private void updateUi(Event event) {
+    private void updateUi(Event event) throws IllegalArgumentException {
+        if (event == null) {
+            throw new IllegalArgumentException("Event : event must not be null.");
+        }
+
         Log.d(TAG, "updateUi: source " + event.getUpdateSource());
+
+        // If the trigger is simply the user editing the event, no need to update the whole UI unless this is the first call
+        if (mEditing == mSaveEventViewModel.getEvent().getValue().isEditing()
+                && !isLoading()) {
+            return;
+        }
 
         // Updates the editable state of the UI based on the event data
         updateEditState(event);
@@ -358,9 +385,11 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         mTitleEditText.setText(event.getTitle());
         mLocationEditText.setText(event.getLocation());
 
-        if ((event.getStartDateTime() != null && event.getEndDateTime() != null)
-                || event.getOpenDate() != null) {
-            updateDateDisplay(event);
+        mDateAndTimeEditText.setText(mEventPresenter.formatDate(event));
+
+        if (!event.hasSetDate()) {
+            Toast.makeText(getActivity(), "Implement submit availability button and inform user that it's date has not been decided yet.", Toast.LENGTH_LONG)
+                    .show();
         }
 
         if (mAttributeAdapter == null) {
@@ -380,8 +409,12 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
     private void saveEvent() {
         Log.d(TAG, "saveEvent: ");
 
+        // Should not be here
+        // Move to the ViewModel
         if (mSaveEventViewModel.getGroup().getValue() != null) {
 
+            // Should not be here
+            // Move to the ViewModel where it checks if these values are null and subsequently adds them if they are
             if (mNewEvent) {
                 Objects.requireNonNull(mSaveEventViewModel.getEvent().getValue()).setGroupValues(mSaveEventViewModel.getGroup().getValue());
                 mSaveEventViewModel.getEvent().getValue().setCreated(new Date());
@@ -390,6 +423,7 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
             mSaveEventViewModel.saveEvent().observe(this, mEventSaveState -> {
 
+                // Change the case values to static variables
                 switch (mEventSaveState) {
                     case 0:
                         Snackbar.make(mSnackbarContext, "Event saved failed", Snackbar.LENGTH_LONG)
@@ -402,9 +436,7 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
                                     .show();
                             mNewEvent = false;
                             mSaveEventViewModel.startListening();
-                            mSaveEventViewModel.getEvent().observe(this, mEvent -> {
-                                updateUi(mEvent);
-                            });
+                            initEventObserver();
                         } else {
                             Snackbar.make(mSnackbarContext, "Event saved", Snackbar.LENGTH_LONG)
                                     .setAction("Undo", v -> rollbackSave())
@@ -520,58 +552,15 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         }
     }
 
-    private void updateDateDisplay(Event event) {
-        Log.d(TAG, "updateDateDisplay: ");
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat(EventSchema.EventCollection.Formats.DATE_FORMAT);
-        SimpleDateFormat timeFormat = new SimpleDateFormat(EventSchema.EventCollection.Formats.TIME_FORMAT);
-
-        Date startDate = null;
-        Date startTime = null;
-        Date endDate = null;
-        Date endTime = null;
-
-        if (event.getStartDateTime() != null && event.getEndDateTime() != null) {
-            try {
-                startDate = dateFormat.parse(dateFormat.format(event.getStartDateTime()));
-                startTime = timeFormat.parse(timeFormat.format(event.getStartDateTime()));
-                endDate = dateFormat.parse(dateFormat.format(event.getEndDateTime()));
-                endTime = timeFormat.parse(timeFormat.format(event.getEndDateTime()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            mSetDateAndTimeToggle.setChecked(true);
-
-            if (endDate.after(startDate)) {
-                mDateAndTimeEditText.setText(timeFormat.format(startTime) + " " + dateFormat.format(startDate) + " - "
-                        + timeFormat.format(endTime) + " " + dateFormat.format(endDate));
-            } else {
-                mDateAndTimeEditText.setText(dateFormat.format(startDate) + " " + timeFormat.format(startTime) + " - "
-                        + timeFormat.format(endTime));
-            }
-        } else {
-            try {
-                startDate = dateFormat.parse(dateFormat.format(event.getOpenDate().getStartDate()));
-                startTime = timeFormat.parse(timeFormat.format(event.getOpenDate().getStartDate()));
-                endDate = dateFormat.parse(dateFormat.format(event.getOpenDate().getEndDate()));
-                endTime = timeFormat.parse(timeFormat.format(event.getOpenDate().getEndDate()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            mOpenDateAndTimeToggle.setChecked(true);
-
-            mDateAndTimeEditText.setText(dateFormat.format(startDate) + "  - " + dateFormat.format(endDate) + "\n"
-                    + timeFormat.format(startTime) + " - " + timeFormat.format(endTime));
-        }
-
-    }
-
     private void setEditTextEditable(EditText editText, boolean editable) {
         editText.setFocusable(editable);
         editText.setFocusableInTouchMode(editable);
     }
+
+    private void setEventPresenter(EventPresenter eventPresenter) {
+        this.mEventPresenter = eventPresenter;
+    }
+
 
     private class AttributeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

@@ -6,10 +6,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.ahwers.grouptivity.Models.BacklogActivity;
+import com.ahwers.grouptivity.Models.DataModels.BacklogActivity;
 import com.ahwers.grouptivity.Models.DocumentSchemas.GroupSchema;
 import com.ahwers.grouptivity.Models.DocumentSchemas.GroupSchema.GroupCollection;
-import com.ahwers.grouptivity.Models.Group;
+import com.ahwers.grouptivity.Models.DataModels.Group;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

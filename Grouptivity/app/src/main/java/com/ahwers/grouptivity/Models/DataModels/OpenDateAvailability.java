@@ -1,4 +1,4 @@
-package com.ahwers.grouptivity.Models;
+package com.ahwers.grouptivity.Models.DataModels;
 
 import com.ahwers.grouptivity.Models.DocumentSchemas.AvailabilitySchema;
 import com.ahwers.grouptivity.Models.DocumentSchemas.AvailabilitySchema.AvailabilityDocument;

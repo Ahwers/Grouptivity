@@ -1,4 +1,4 @@
-package com.ahwers.grouptivity.Models;
+package com.ahwers.grouptivity.Models.DataModels;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -17,6 +17,7 @@ import java.util.Map;
 
 public class Event implements Parcelable {
 
+    // Shouldn't be here
     public static final String UPDATE_SOURCE_LOCAL = "local";
     public static final String UPDATE_SOURCE_SERVER = "server";
 
@@ -36,6 +37,7 @@ public class Event implements Parcelable {
     private List<GroupMember> mParticipants = new ArrayList<>();
     private List<ExtraAttribute> mExtraAttributes = new ArrayList<>();
     private String mUpdateSource;
+    private boolean mEditing;
 
     public Event() {
 
@@ -88,11 +90,14 @@ public class Event implements Parcelable {
                         (List<String>) flexDateMap.get(EventCollection.Cols.FlexDateTime.VOTERS)
                 );
             }
-        } else {
-            mOpenDate = new OpenDateTime();
         }
+//        } else {
+//            mOpenDate = new OpenDateTime();
+//        }
 
         setExtraAttributes((HashMap<String, String>) document.get(EventSchema.EventCollection.Cols.EXTRA_ATTRIBUTES));
+
+        mEditing = (boolean) document.get("editing");
 
     }
 
@@ -142,6 +147,8 @@ public class Event implements Parcelable {
         eventMap.put(EventSchema.EventCollection.Cols.CREATOR, mCreatorId);
         eventMap.put(EventCollection.Cols.LAST_UPDATED, new Date());
 
+        eventMap.put("editing" , mEditing);
+
         return eventMap;
 
     }
@@ -169,6 +176,10 @@ public class Event implements Parcelable {
             }
         }
         return false;
+    }
+
+    public boolean hasSetDate() {
+        return mStartDateTime != null;
     }
 
     public boolean dateIsSet() {
@@ -413,5 +424,13 @@ public class Event implements Parcelable {
 
     public void setUpdateSource(String updateSource) {
         mUpdateSource = updateSource;
+    }
+
+    public boolean isEditing() {
+        return mEditing;
+    }
+
+    public void setEditing(boolean editing) {
+        mEditing = editing;
     }
 }

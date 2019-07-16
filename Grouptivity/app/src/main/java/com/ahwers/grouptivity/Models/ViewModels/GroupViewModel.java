@@ -3,7 +3,7 @@ package com.ahwers.grouptivity.Models.ViewModels;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.ahwers.grouptivity.Models.Group;
+import com.ahwers.grouptivity.Models.DataModels.Group;
 import com.ahwers.grouptivity.Models.Repositories.GroupRepository;
 
 public class GroupViewModel extends ViewModel {

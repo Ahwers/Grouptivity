@@ -23,7 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ahwers.grouptivity.Activities.SignInActivity;
-import com.ahwers.grouptivity.Models.Group;
+import com.ahwers.grouptivity.Models.DataModels.Group;
 import com.ahwers.grouptivity.Models.ViewModels.GroupViewModel;
 import com.ahwers.grouptivity.R;
 import com.google.firebase.auth.FirebaseAuth;

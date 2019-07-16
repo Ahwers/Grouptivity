@@ -1,4 +1,4 @@
-package com.ahwers.grouptivity.Models;
+package com.ahwers.grouptivity.Models.DataModels;
 
 public class ExtraAttribute {
 

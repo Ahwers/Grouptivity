@@ -1,4 +1,4 @@
-package com.ahwers.grouptivity.Models;
+package com.ahwers.grouptivity.Models.DataModels;
 
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema.EventCollection;
 import com.ahwers.grouptivity.Models.DocumentSchemas.GroupSchema;

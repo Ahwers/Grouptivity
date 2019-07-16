@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ahwers.grouptivity.Models.BacklogActivity;
+import com.ahwers.grouptivity.Models.DataModels.BacklogActivity;
 import com.ahwers.grouptivity.Models.DocumentSchemas.GroupSchema;
 import com.ahwers.grouptivity.Models.DocumentSchemas.GroupSchema.GroupCollection;
 import com.ahwers.grouptivity.R;

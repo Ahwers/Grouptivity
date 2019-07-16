@@ -23,13 +23,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ahwers.grouptivity.Activities.AvailabilitySubmissionActivity;
-import com.ahwers.grouptivity.Activities.EventPagerActivity;
 import com.ahwers.grouptivity.Activities.SaveEventActivity;
 import com.ahwers.grouptivity.Activities.SaveGroupActivity;
 import com.ahwers.grouptivity.Activities.SignInActivity;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema.EventCollection;
-import com.ahwers.grouptivity.Models.Event;
+import com.ahwers.grouptivity.Models.DataModels.Event;
 import com.ahwers.grouptivity.Models.ViewModels.EventListViewModel;
 import com.ahwers.grouptivity.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -461,7 +460,7 @@ public class EventListFragment extends Fragment {
         public EventViewHolder(LayoutInflater inflater, ViewGroup parent, int layoutId) {
             super(inflater.inflate(layoutId, parent, false));
 
-            mTitleTextView = (TextView) itemView.findViewById(R.id.event_title);
+            mTitleTextView = (TextView) itemView.findViewById(R.id.event_title_edit_text);
             mGroupTextView = (TextView) itemView.findViewById(R.id.event_group);
 
             itemView.setOnClickListener(this);
@@ -566,7 +565,7 @@ public class EventListFragment extends Fragment {
         public SubtitleHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_subtitle, parent, false));
 
-            mMainTextView = (TextView) itemView.findViewById(R.id.event_title);
+            mMainTextView = (TextView) itemView.findViewById(R.id.event_title_edit_text);
 
             mSubTextView = (TextView) itemView.findViewById(R.id.subtitle_sub);
         }

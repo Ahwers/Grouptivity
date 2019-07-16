@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.ahwers.grouptivity.Models.Group;
+import com.ahwers.grouptivity.Models.DataModels.Group;
 import com.ahwers.grouptivity.Models.ViewModels.SaveGroupViewModel;
 import com.ahwers.grouptivity.R;
 

@@ -17,31 +17,17 @@ import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.ahwers.grouptivity.Models.DocumentSchemas.AvailabilitySchema.AvailabilityDocument;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema;
-import com.ahwers.grouptivity.Models.OpenDateAvailability;
-import com.ahwers.grouptivity.Models.Event;
+import com.ahwers.grouptivity.Models.DataModels.OpenDateAvailability;
 import com.ahwers.grouptivity.Models.ViewModels.AvailabilitySubmissionViewModel;
-import com.ahwers.grouptivity.Models.ViewModels.EventListViewModel;
 import com.ahwers.grouptivity.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AvailabilitySubmissionFragment extends Fragment {
 

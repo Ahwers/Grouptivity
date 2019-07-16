@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.ahwers.grouptivity.Activities.SaveEventActivity;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema;
-import com.ahwers.grouptivity.Models.Event;
+import com.ahwers.grouptivity.Models.DataModels.Event;
 import com.ahwers.grouptivity.R;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -68,7 +68,7 @@ public class EventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_event, container, false);
 
-        mTitleTextView = v.findViewById(R.id.event_title);
+        mTitleTextView = v.findViewById(R.id.event_title_edit_text);
         mTitleTextView.setText(mEvent.getTitle());
 
         mGroupAndTypeTextView = v.findViewById(R.id.event_type);

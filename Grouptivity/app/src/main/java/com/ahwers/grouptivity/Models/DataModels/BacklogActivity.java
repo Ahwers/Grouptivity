@@ -1,4 +1,4 @@
-package com.ahwers.grouptivity.Models;
+package com.ahwers.grouptivity.Models.DataModels;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;

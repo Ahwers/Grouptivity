@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import com.ahwers.grouptivity.Fragments.AvailabilitySubmissionFragment;
-import com.ahwers.grouptivity.Models.Event;
 
 import java.util.Date;
 

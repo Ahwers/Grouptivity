@@ -25,7 +25,7 @@ import com.ahwers.grouptivity.Fragments.GroupFragment;
 import com.ahwers.grouptivity.Fragments.MyAccountFragment;
 import com.ahwers.grouptivity.Fragments.EventListFragment;
 import com.ahwers.grouptivity.Fragments.GroupsListFragment;
-import com.ahwers.grouptivity.Models.Group;
+import com.ahwers.grouptivity.Models.DataModels.Group;
 import com.ahwers.grouptivity.Models.ViewModels.NavigationViewModel;
 import com.ahwers.grouptivity.R;
 import com.firebase.ui.auth.AuthUI;

@@ -3,10 +3,9 @@ package com.ahwers.grouptivity.Models.ViewModels;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.ahwers.grouptivity.Models.OpenDateAvailability;
+import com.ahwers.grouptivity.Models.DataModels.OpenDateAvailability;
 import com.ahwers.grouptivity.Models.Repositories.EventRepository;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

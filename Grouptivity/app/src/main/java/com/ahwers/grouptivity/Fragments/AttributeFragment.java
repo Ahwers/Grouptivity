@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.ahwers.grouptivity.Models.ExtraAttribute;
+import com.ahwers.grouptivity.Models.DataModels.ExtraAttribute;
 import com.ahwers.grouptivity.R;
 
 

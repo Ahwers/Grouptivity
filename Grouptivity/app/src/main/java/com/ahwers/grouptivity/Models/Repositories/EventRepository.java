@@ -8,8 +8,8 @@ import android.util.Log;
 import com.ahwers.grouptivity.Models.DocumentSchemas.AvailabilitySchema;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema.EventCollection;
-import com.ahwers.grouptivity.Models.Event;
-import com.ahwers.grouptivity.Models.OpenDateAvailability;
+import com.ahwers.grouptivity.Models.DataModels.Event;
+import com.ahwers.grouptivity.Models.DataModels.OpenDateAvailability;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -44,7 +44,10 @@ public class EventRepository {
 
     protected String mNewEventId;
 
+    // I think the listeners prevent this from being a singleton.
+    // Think about this and refactor
     private ListenerRegistration mEventListener;
+
     private FirebaseFirestore mDb;
 
     public LiveData<Event> getEvent(String eventId) {
@@ -352,6 +355,27 @@ public class EventRepository {
                 });
 
         return data;
+    }
+
+    public void updateEditingState(String eventId, boolean editing) {
+        mDb = FirebaseFirestore.getInstance();
+
+        DocumentReference eventDoc = mDb.collection(EventCollection.NAME).document(eventId);
+
+        eventDoc
+                .update("editing", editing)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                    }
+                });
     }
 
 }

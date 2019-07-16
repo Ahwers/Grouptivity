@@ -30,4 +30,8 @@ public class LoadableFragment extends Fragment {
         mProgressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
     }
 
+    protected boolean isLoading() {
+        return mProgressBar.getVisibility() == View.GONE ? false : true;
+    }
+
 }

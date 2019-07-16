@@ -11,10 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:clickable="true"
         app:layout_anchor="@id/root"
-        app:layout_anchorGravity="top|right"
+        app:layout_anchorGravity="bottom|right"
         app:srcCompat="@drawable/ic_close" />
 
     <android.support.design.widget.FloatingActionButton
@@ -22,10 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:clickable="true"
         app:layout_anchor="@id/root"
-        app:layout_anchorGravity="bottom|right"
+        app:layout_anchorGravity="top|right"
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_save" />
 
@@ -80,7 +80,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <EditText
-                    android:id="@+id/event_title"
+                    android:id="@+id/event_title_edit_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -93,43 +93,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/event_name_label" />
 
                 <TextView
-                    android:id="@+id/date_and_time_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/event_date_and_time_label"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/event_location" />
-
-                <ToggleButton
-                    android:id="@+id/set_date"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:textOff="Set"
-                    android:textOn="Set"
-                    app:layout_constraintEnd_toStartOf="@+id/flex_date"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/date_and_time_text_view" />
-
-                <ToggleButton
-                    android:id="@+id/flex_date"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/flex_date"
-                    android:textOff="Flex"
-                    android:textOn="Flex"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/set_date"
-                    app:layout_constraintTop_toBottomOf="@+id/date_and_time_text_view" />
-
-                <TextView
                     android:id="@+id/event_location_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -137,7 +100,7 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/event_location_label"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/event_title" />
+                    app:layout_constraintTop_toBottomOf="@+id/event_title_edit_text" />
 
                 <EditText
                     android:id="@+id/event_location"
@@ -152,8 +115,28 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/event_location_label" />
 
+                <View
+                    android:id="@+id/top_date_and_time_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/event_location" />
+
+                <TextView
+                    android:id="@+id/date_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Date"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/top_date_and_time_divider" />
+
                 <EditText
-                    android:id="@+id/date_and_time_text_view"
+                    android:id="@+id/date_edit_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -161,19 +144,81 @@
                     android:layout_marginEnd="16dp"
                     android:ems="10"
                     android:inputType="textPersonName"
+                    android:focusable="false"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/date_and_time_label" />
+                    app:layout_constraintTop_toBottomOf="@+id/date_label" />
+
+                <TextView
+                    android:id="@+id/time_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Time"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/date_edit_text" />
+
+                <EditText
+                    android:id="@+id/time_edit_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:focusable="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/time_label" />
+
+                <View
+                    android:id="@+id/bottom_date_and_time_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/set_date" />
+
+                <ToggleButton
+                    android:id="@+id/set_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:textOff="Set"
+                    android:textOn="Set"
+                    app:layout_constraintEnd_toStartOf="@+id/flex_date"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/time_edit_text" />
+
+                <ToggleButton
+                    android:id="@+id/flex_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/flex_date"
+                    android:textOff="Flex"
+                    android:textOn="Flex"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/set_date"
+                    app:layout_constraintTop_toBottomOf="@+id/time_edit_text" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/extra_attributes_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/set_date" />
+                    app:layout_constraintTop_toBottomOf="@+id/bottom_date_and_time_divider" />
 
                 <Button
                     android:id="@+id/add_attribute_button"

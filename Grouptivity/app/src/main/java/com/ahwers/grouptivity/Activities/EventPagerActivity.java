@@ -10,7 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.ahwers.grouptivity.Fragments.EventFragment;
-import com.ahwers.grouptivity.Models.Event;
+import com.ahwers.grouptivity.Models.DataModels.Event;
 import com.ahwers.grouptivity.R;
 
 import java.util.ArrayList;

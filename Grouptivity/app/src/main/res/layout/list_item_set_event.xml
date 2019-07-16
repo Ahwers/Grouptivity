@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/event_title"
+        android:id="@+id/event_title_edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -53,5 +53,5 @@
         tools:text="loading party"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_title" />
+        app:layout_constraintTop_toBottomOf="@+id/event_title_edit_text" />
 </android.support.constraint.ConstraintLayout>

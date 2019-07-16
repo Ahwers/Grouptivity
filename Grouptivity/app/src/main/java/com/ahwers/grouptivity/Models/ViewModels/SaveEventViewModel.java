@@ -4,12 +4,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.ahwers.grouptivity.Models.Event;
-import com.ahwers.grouptivity.Models.ExtraAttribute;
-import com.ahwers.grouptivity.Models.Group;
+import com.ahwers.grouptivity.Models.DataModels.Event;
+import com.ahwers.grouptivity.Models.DataModels.ExtraAttribute;
+import com.ahwers.grouptivity.Models.DataModels.Group;
+import com.ahwers.grouptivity.Models.Presenters.EventPresenter;
 import com.ahwers.grouptivity.Models.Repositories.EventRepository;
 import com.ahwers.grouptivity.Models.Repositories.GroupRepository;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +29,7 @@ public class SaveEventViewModel extends ViewModel {
     private String mEventId;
     private boolean mListening;
 
+    // Inject this shit dude
     public SaveEventViewModel() {
         mEventRepository = new EventRepository();
         mGroupRepository = new GroupRepository();
@@ -91,6 +92,17 @@ public class SaveEventViewModel extends ViewModel {
             final MutableLiveData<Integer> data = new MutableLiveData<>();
             data.setValue(-10);
             return data;
+        }
+    }
+
+    public void updateEventEditingState(boolean editing) {
+        Event event = mEvent.getValue();
+        if (event != null) {
+            // Don't attempt to update an inexistant event or update it's editing field to it's already current value
+            if (event.getId() != null && event.isEditing() != editing) {
+                event.setEditing(editing);
+                mEventRepository.updateEditingState(event.getId(), editing);
+            }
         }
     }
 
