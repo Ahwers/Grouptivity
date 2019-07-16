@@ -74,6 +74,14 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
     // Inject as singleton
     private EventPresenter mEventPresenter;
 
+    /**
+     * Pseudo constructor; attaches fragment arguments and initialises singletons.
+     * RETURNS ready to work instance of SaveEventFragment.
+     *
+     * @param eventId   The ID of the event being displayed. NULL if creating a new event.
+     * @param groupId   The ID of the displayed event's group or group the event is being created for.
+     * @return
+     */
     public static SaveEventFragment newInstance(String eventId, String groupId) {
         Log.d(TAG, "newInstance: ");
 
@@ -90,6 +98,10 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         return fragment;
     }
 
+    /**
+     * Initial set up logic for the fragment; loads the fragment's ViewModel and initialises it with the fragment args (see newInstance).
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
@@ -116,6 +128,9 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         }
     }
 
+    /**
+     * Initialises an observer on the event data so that external changes to the event can be processed in real time.
+     */
     private void initEventObserver() {
         mSaveEventViewModel.getEvent().observe(this, mEvent -> {
             try {
@@ -260,6 +275,14 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         }
     }
 
+    /**
+     * OnClick actions for the following editing related buttons:
+     * Edit event
+     * Stop editing event
+     * Save event
+     *
+     * @param v The button that activated this listener.
+     */
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
@@ -279,6 +302,13 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         }
     }
 
+    /**
+     * Helper class that creates and displays a snackbar message with an action button.
+     *
+     * @param snackMessage      The message for the snackbar to display.
+     * @param snackAction       The snackbar action's onClick action.
+     * @param snackActionName   The snackbar action's button text.
+     */
     private void makeASnack(String snackMessage, View.OnClickListener snackAction, String snackActionName) {
         if (snackMessage == null) {
             throw new IllegalArgumentException("A snack needs a message.");
@@ -295,6 +325,11 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
         snack.show();
     }
 
+    /**
+     * Helper class that creates and displays a snackbar messgage;
+     *
+     * @param snackMessage  The message for the snackbar to display.
+     */
     public void makeASnack(String snackMessage) {
         if (snackMessage == null) {
             throw new IllegalArgumentException("A snack needs a message.");
@@ -306,6 +341,7 @@ public class SaveEventFragment extends LoadableFragment implements View.OnClickL
 
     /**
      * Sets the event's editing state and updates the UI accordingly.
+     * Also updates the event document's editing state so that multiple members cannot edit the event concurrently.
      *
      * @param editing The new editing state of the UI.
      */
