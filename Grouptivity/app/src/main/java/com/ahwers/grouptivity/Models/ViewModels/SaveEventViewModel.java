@@ -7,12 +7,13 @@ import android.arch.lifecycle.ViewModel;
 import com.ahwers.grouptivity.Models.DataModels.Event;
 import com.ahwers.grouptivity.Models.DataModels.ExtraAttribute;
 import com.ahwers.grouptivity.Models.DataModels.Group;
-import com.ahwers.grouptivity.Models.Presenters.EventPresenter;
 import com.ahwers.grouptivity.Models.Repositories.EventRepository;
 import com.ahwers.grouptivity.Models.Repositories.GroupRepository;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class SaveEventViewModel extends ViewModel {
 
@@ -25,7 +26,7 @@ public class SaveEventViewModel extends ViewModel {
     private LiveData<Event> mEvent;
     private LiveData<Group> mGroup;
 
-    private Event mEventRollback;
+    private Event mRollbackEvent;
     private String mEventId;
     private boolean mListening;
 
@@ -35,23 +36,32 @@ public class SaveEventViewModel extends ViewModel {
         mGroupRepository = new GroupRepository();
     }
 
-    public void init(String eventId, String groupId) {
-        if (mEvent != null) {
+    public enum EntityType {
+        EVENT,
+        GROUP
+    }
+
+    public void init(EntityType type, String entityId) {
+        if (mEvent != null || mGroup != null) {
             return;
         }
 
-        mEventId = eventId;
-        if (mEventId == null) {
-            // New event
-            final MutableLiveData<Event> data = new MutableLiveData<>();
-            data.setValue(new Event());
-            mEvent = data;
-        } else {
-            // Existing event
-            startListening();
-        }
+        switch (type) {
 
-        mGroup = mGroupRepository.getGroup(groupId);
+            // Viewing an existing event.
+            case EVENT:
+                mEventId = entityId;
+                startListening();
+                break;
+
+            // Creating a new event.
+            case GROUP:
+                final MutableLiveData<Event> data = new MutableLiveData<>();
+                data.setValue(new Event());
+                mEvent = data;
+                mGroup = mGroupRepository.getGroup(entityId);
+                break;
+        }
     }
 
     public LiveData<Event> getEvent() {
@@ -82,6 +92,9 @@ public class SaveEventViewModel extends ViewModel {
         Event event = mEvent.getValue();
         if (event.isValid()) {
             if (event.getId() == null) {
+                event.setGroupValues(mGroup.getValue());
+                event.setCreated(new Date());
+                event.setCreatorId(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
                 mEventSaveState = mEventRepository.addEvent(event);
                 return mEventSaveState;
             } else {
@@ -98,6 +111,7 @@ public class SaveEventViewModel extends ViewModel {
     public void updateEventEditingState(boolean editing) {
         Event event = mEvent.getValue();
         if (event != null) {
+
             // Don't attempt to update an inexistant event or update it's editing field to it's already current value
             if (event.getId() != null && event.isEditing() != editing) {
                 event.setEditing(editing);
@@ -107,7 +121,7 @@ public class SaveEventViewModel extends ViewModel {
     }
 
     public LiveData<Integer> rollbackSave() {
-        mRollbackState = mEventRepository.setEvent(mEventRollback);
+        mRollbackState = mEventRepository.setEvent(mRollbackEvent);
         return mRollbackState;
     }
 
@@ -131,8 +145,12 @@ public class SaveEventViewModel extends ViewModel {
         return mEvent.getValue().getEndDateTime();
     }
 
-    public void setEventRollback(Event eventRollback) {
-        mEventRollback = eventRollback;
+    public void setRollbackEvent() {
+        mRollbackEvent = mEvent.getValue();
+    }
+
+    public Event getRollbackEvent() {
+        return this.mRollbackEvent;
     }
 
     public List<ExtraAttribute> getEventCustomAttributes() {

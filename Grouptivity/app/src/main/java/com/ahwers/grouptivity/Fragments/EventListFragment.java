@@ -23,7 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ahwers.grouptivity.Activities.AvailabilitySubmissionActivity;
-import com.ahwers.grouptivity.Activities.SaveEventActivity;
+import com.ahwers.grouptivity.Activities.EventActivity;
 import com.ahwers.grouptivity.Activities.SaveGroupActivity;
 import com.ahwers.grouptivity.Activities.SignInActivity;
 import com.ahwers.grouptivity.Models.DocumentSchemas.EventSchema;
@@ -102,7 +102,7 @@ public class EventListFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Intent intent = SaveEventActivity.newIntent(getActivity(), null, mEventListViewModel.getGroupId());
+                Intent intent = EventActivity.newIntent(getActivity(), null, mEventListViewModel.getGroupId());
                 startActivity(intent);
             }
         });
@@ -482,7 +482,7 @@ public class EventListFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            Intent intent = SaveEventActivity.newIntent(getActivity(), mEvent.getId(), mEvent.getGroupId());
+            Intent intent = EventActivity.newIntent(getActivity(), mEvent.getId(), null);
             startActivity(intent);
         }
 

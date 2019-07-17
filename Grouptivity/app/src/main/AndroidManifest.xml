@@ -25,9 +25,8 @@
             android:name=".Activities.SaveGroupActivity"
             android:label="SaveGroupActivity"
             android:windowSoftInputMode="adjustPan"></activity>
-        <activity android:name=".Activities.EventPagerActivity" />
         <activity android:name=".Activities.AvailabilitySubmissionActivity" />
-        <activity android:name=".Activities.SaveEventActivity" />
+        <activity android:name=".Activities.EventActivity" />
     </application>
 
 </manifest>
