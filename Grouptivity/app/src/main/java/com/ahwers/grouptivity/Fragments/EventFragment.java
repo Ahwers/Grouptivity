@@ -75,6 +75,15 @@ public class EventFragment extends LoadableFragment {
         VIEW_EVENT
     }
 
+    /**
+     * Pseudo constructor that attaches required arguments to the fragment.
+     * EventID XOR GroupID
+     * EventID will display that event while GroupID will create a new event.
+     *
+     * @param eventId   The ID of the event to be displayed.
+     * @param groupId   The ID of the group that the new event will belong to.
+     * @return
+     */
     public static EventFragment newInstance(String eventId, String groupId) {
         Log.d(TAG, "newInstance: ");
 
@@ -95,6 +104,14 @@ public class EventFragment extends LoadableFragment {
         return fragment;
     }
 
+    /**
+     * Instantiates the fragment's views and prepares the UI for use if NEW_EVENT.
+     *
+     * @param inflater              Used to pull the fragment' view from it's XML file.
+     * @param container             Don't know actually.
+     * @param savedInstanceState    Used for state persistence across configuration changes and forced memory wipes.
+     * @return                      Returns the view object for the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: ");
@@ -223,6 +240,11 @@ public class EventFragment extends LoadableFragment {
         return view;
     }
 
+    /**
+     * Initialises the ViewModel and determines the initial state of the fragment.
+     *
+     * @param savedInstanceState Used for state persistence across configuration changes and forced memory wipes.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
@@ -253,6 +275,9 @@ public class EventFragment extends LoadableFragment {
 
     }
 
+    /**
+     * Show's loading animation and initiates event listener if not already listening.
+     */
     @Override
     public void onStart() {
         Log.d(TAG, "onStart: ");
@@ -266,6 +291,9 @@ public class EventFragment extends LoadableFragment {
         }
     }
 
+    /**
+     * Closes event listener if listening.
+     */
     @Override
     public void onStop() {
         Log.d(TAG, "onStop: ");
@@ -278,12 +306,21 @@ public class EventFragment extends LoadableFragment {
         }
     }
 
+    /**
+     * Initialises the observation of the event document being listened to.
+     */
     private void initEventObserver() {
         mSaveEventViewModel.getEvent().observe(this, mEvent -> {
             updateUi(mEvent);
         });
     }
 
+    /**
+     * Updates the UI according to the updated event data.
+     * Called from the event observer.
+     *
+     * @param event The updated event object.
+     */
     private void updateUi(Event event) {
         // If user's ownership status has been revoked or it is the first call.
         if ((!event.isUserOwner(mAuth.getCurrentUser().getUid()) && mUiState == UiState.EDIT_EVENT)
@@ -301,6 +338,9 @@ public class EventFragment extends LoadableFragment {
         }
     }
 
+    /**
+     * Changes the UI state to EDIITING and updates the rollback event.
+     */
     private void startEditingEvent() {
         setEditing(true);
 
@@ -309,6 +349,9 @@ public class EventFragment extends LoadableFragment {
 
     }
 
+    /**
+     * Changes the UI state to VIEWING and reverts the UI values to the rollback event's.
+     */
     private void stopEditingEvent() {
         setEditing(false);
 
@@ -316,6 +359,11 @@ public class EventFragment extends LoadableFragment {
         setViewValues(mSaveEventViewModel.getRollbackEvent());
     }
 
+    /**
+     * Updates the editable state of the UI based off of the new declared state.
+     *
+     * @param editing Boolean value for the editable state.
+     */
     private void setEditing(boolean editing) {
         if (mUiState != UiState.NEW_EVENT) {
             mUiState = editing ? UiState.EDIT_EVENT : UiState.VIEW_EVENT;
@@ -354,6 +402,11 @@ public class EventFragment extends LoadableFragment {
         }
     }
 
+    /**
+     * Updates the values of the UI views to the data of the passed event.
+     *
+     * @param event The event to display.
+     */
     private void setViewValues(Event event) {
         mTitleEditText.setText(event.getTitle());
         mLocationEditText.setText(event.getLocation());
