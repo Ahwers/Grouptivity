@@ -9,13 +9,14 @@ import com.ahwers.grouptivity.Models.DocumentSchemas.GroupSchema;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Event implements Parcelable {
+public class Event {
 
     // Shouldn't be here
     public static final String UPDATE_SOURCE_LOCAL = "local";
@@ -294,6 +295,56 @@ public class Event implements Parcelable {
         mEndDateTime = endDateTime;
     }
 
+    public String getDateToString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EventSchema.EventCollection.Formats.DATE_FORMAT);
+
+        Date startDate;
+        Date endDate;
+
+        String dateOutput = "";
+
+        if (hasSetDate()) {
+            startDate = getStartDateTime();
+            endDate = getEndDateTime();
+        } else {
+            startDate = getOpenDate().getStartDate();
+            endDate = getOpenDate().getEndDate();
+            dateOutput = dateOutput + "Between: ";
+        }
+
+        dateOutput = dateOutput + dateFormat.format(startDate) + " ";
+
+        if (endDate.after(startDate)) {
+            dateOutput = dateOutput + ("to " + dateFormat.format(endDate));
+        }
+
+        return dateOutput;
+    }
+
+    public String getTimeToString() {
+        SimpleDateFormat timeFormat = new SimpleDateFormat(EventSchema.EventCollection.Formats.TIME_FORMAT);
+
+        Date startDate;
+        Date endDate;
+
+        String timeOutput = "";
+
+        if (hasSetDate()) {
+            startDate = getStartDateTime();
+            endDate = getEndDateTime();
+
+            timeOutput = timeOutput + timeFormat.format(startDate) + " ";
+
+            if (endDate.after(startDate)) {
+                timeOutput = timeOutput + ("- " + timeFormat.format(endDate));
+            }
+        } else {
+            timeOutput = "Undecided";
+        }
+
+        return timeOutput;
+    }
+
     public Date getLastUpdated() {
         return mLastUpdated;
     }
@@ -318,73 +369,73 @@ public class Event implements Parcelable {
         mCreatorId = creatorId;
     }
 
-    protected Event(Parcel in) {
-        mId = in.readString();
-        mTitle = in.readString();
-        mType = in.readString();
-        mLocation = in.readString();
-        mStartDateTime = (Date) in.readSerializable();
-        mEndDateTime = (Date) in.readSerializable();
-        mOpenDate = new OpenDateTime();
-        mOpenDate.setStartDate((Date) in.readSerializable());
-        mOpenDate.setEndDate((Date) in.readSerializable());
-        List<String> voters = new ArrayList<>();
-        in.readStringList(voters);
-        mOpenDate.setVoters(voters);
-        List<String> titles = new ArrayList<>();
-        in.readStringList(titles);
-        List<String> values = new ArrayList<>();
-        in.readStringList(values);
-        setExtraAttributes(titles, values);
-
-        mGroupId = in.readString();
-        mGroupName = in.readString();
-        in.readStringList(mGroupOwners);
-
-        mCreated = (Date) in.readSerializable();
-        mLastUpdated = (Date) in.readSerializable();
-        mCreatorId = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mId);
-        dest.writeString(mTitle);
-        dest.writeString(mType);
-        dest.writeString(mLocation);
-        dest.writeSerializable(mStartDateTime);
-        dest.writeSerializable(mEndDateTime);
-        dest.writeSerializable(mOpenDate.getStartDate());
-        dest.writeSerializable(mOpenDate.getEndDate());
-        dest.writeStringList(mOpenDate.getVoters());
-        dest.writeStringList(getExtraAttributeTitles());
-        dest.writeStringList(getExtraAttributeValues());
-
-        dest.writeString(mGroupId);
-        dest.writeString(mGroupName);
-        dest.writeStringList(mGroupOwners);
-
-        dest.writeSerializable(mCreated);
-        dest.writeSerializable(mLastUpdated);
-        dest.writeString(mCreatorId);
-    }
-
-    public static final Creator<Event> CREATOR = new Creator<Event>() {
-        @Override
-        public Event createFromParcel(Parcel in) {
-            return new Event(in);
-        }
-
-        @Override
-        public Event[] newArray(int size) {
-            return new Event[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+//    protected Event(Parcel in) {
+//        mId = in.readString();
+//        mTitle = in.readString();
+//        mType = in.readString();
+//        mLocation = in.readString();
+//        mStartDateTime = (Date) in.readSerializable();
+//        mEndDateTime = (Date) in.readSerializable();
+//        mOpenDate = new OpenDateTime();
+//        mOpenDate.setStartDate((Date) in.readSerializable());
+//        mOpenDate.setEndDate((Date) in.readSerializable());
+//        List<String> voters = new ArrayList<>();
+//        in.readStringList(voters);
+//        mOpenDate.setVoters(voters);
+//        List<String> titles = new ArrayList<>();
+//        in.readStringList(titles);
+//        List<String> values = new ArrayList<>();
+//        in.readStringList(values);
+//        setExtraAttributes(titles, values);
+//
+//        mGroupId = in.readString();
+//        mGroupName = in.readString();
+//        in.readStringList(mGroupOwners);
+//
+//        mCreated = (Date) in.readSerializable();
+//        mLastUpdated = (Date) in.readSerializable();
+//        mCreatorId = in.readString();
+//    }
+//
+//    @Override
+//    public void writeToParcel(Parcel dest, int flags) {
+//        dest.writeString(mId);
+//        dest.writeString(mTitle);
+//        dest.writeString(mType);
+//        dest.writeString(mLocation);
+//        dest.writeSerializable(mStartDateTime);
+//        dest.writeSerializable(mEndDateTime);
+//        dest.writeSerializable(mOpenDate.getStartDate());
+//        dest.writeSerializable(mOpenDate.getEndDate());
+//        dest.writeStringList(mOpenDate.getVoters());
+//        dest.writeStringList(getExtraAttributeTitles());
+//        dest.writeStringList(getExtraAttributeValues());
+//
+//        dest.writeString(mGroupId);
+//        dest.writeString(mGroupName);
+//        dest.writeStringList(mGroupOwners);
+//
+//        dest.writeSerializable(mCreated);
+//        dest.writeSerializable(mLastUpdated);
+//        dest.writeString(mCreatorId);
+//    }
+//
+//    public static final Creator<Event> CREATOR = new Creator<Event>() {
+//        @Override
+//        public Event createFromParcel(Parcel in) {
+//            return new Event(in);
+//        }
+//
+//        @Override
+//        public Event[] newArray(int size) {
+//            return new Event[size];
+//        }
+//    };
+//
+//    @Override
+//    public int describeContents() {
+//        return 0;
+//    }
 
     public String getGroupName() {
         return mGroupName;

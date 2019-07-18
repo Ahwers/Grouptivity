@@ -2,6 +2,8 @@ package com.ahwers.grouptivity.Fragments;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -36,6 +38,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+
 public class EventFragment extends LoadableFragment {
 
     private static final String TAG = "EventFragment";
@@ -54,7 +58,8 @@ public class EventFragment extends LoadableFragment {
     private EditText mTitleEditText;
     private ToggleButton mSetDateAndTimeToggle;
     private ToggleButton mOpenDateAndTimeToggle;
-    private EditText mDateAndTimeEditText;
+    private EditText mDateEditText;
+    private EditText mTimeEditText;
     private EditText mLocationEditText;
     private CoordinatorLayout mSnackbarContext;
     private RecyclerView mAttributeRecyclerView;
@@ -82,7 +87,7 @@ public class EventFragment extends LoadableFragment {
      *
      * @param eventId   The ID of the event to be displayed.
      * @param groupId   The ID of the group that the new event will belong to.
-     * @return
+     * @return          Returns an EventFragment equipped with arguments.
      */
     public static EventFragment newInstance(String eventId, String groupId) {
         Log.d(TAG, "newInstance: ");
@@ -105,6 +110,41 @@ public class EventFragment extends LoadableFragment {
     }
 
     /**
+     * Initialises the ViewModel and determines the initial state of the fragment.
+     *
+     * @param savedInstanceState Used for state persistence across configuration changes and forced memory wipes.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
+
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() == null) {
+            throw new IllegalArgumentException(
+                    "EventFragment needs to be created through newInstance() in order to provide it with the necessary arguments."
+            );
+        }
+
+        mAuth = FirebaseAuth.getInstance();
+
+        mSaveEventViewModel = ViewModelProviders.of(this).get(SaveEventViewModel.class);
+
+        String eventId = (String) getArguments().get(ARG_EVENT_ID);
+        String groupId = (String) getArguments().get(ARG_GROUP_ID);
+
+        if (eventId != null) {
+            mSaveEventViewModel.init(EntityType.EVENT, eventId);
+            mUiState = UiState.VIEW_EVENT;
+            initEventObserver();
+        } else {
+            mSaveEventViewModel.init(EntityType.GROUP, groupId);
+            mUiState = UiState.NEW_EVENT;
+        }
+
+    }
+
+    /**
      * Instantiates the fragment's views and prepares the UI for use if NEW_EVENT.
      *
      * @param inflater              Used to pull the fragment' view from it's XML file.
@@ -124,6 +164,8 @@ public class EventFragment extends LoadableFragment {
         mSnackbarContext = view.findViewById(R.id.snackbar_context);
 
         mTitleEditText = view.findViewById(R.id.event_title_edit_text);
+        mTitleEditText.setTag("Event Title");
+        mTitleEditText.setOnClickListener(new CopyFieldListener());
         mTitleEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -166,10 +208,19 @@ public class EventFragment extends LoadableFragment {
             }
         });
 
-        mDateAndTimeEditText = view.findViewById(R.id.date_edit_text);
-        mDateAndTimeEditText.setFocusable(false);
+        mDateEditText = view.findViewById(R.id.date_edit_text);
+        mDateEditText.setTag("Event Date");
+        mDateEditText.setOnClickListener(new CopyFieldListener());
+        mDateEditText.setFocusable(false);
+
+        mTimeEditText = view.findViewById(R.id.time_edit_text);
+        mTimeEditText.setTag("Event Time");
+        mTimeEditText.setOnClickListener(new CopyFieldListener());
+        mTimeEditText.setFocusable(false);
 
         mLocationEditText = view.findViewById(R.id.event_location);
+        mLocationEditText.setTag("Event Location");
+        mLocationEditText.setOnClickListener(new CopyFieldListener());
         mLocationEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -240,40 +291,6 @@ public class EventFragment extends LoadableFragment {
         return view;
     }
 
-    /**
-     * Initialises the ViewModel and determines the initial state of the fragment.
-     *
-     * @param savedInstanceState Used for state persistence across configuration changes and forced memory wipes.
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
-
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() == null) {
-            throw new IllegalArgumentException(
-                    "EventFragment needs to be created through newInstance() in order to provide it with the necessary arguments."
-            );
-        }
-
-        mAuth = FirebaseAuth.getInstance();
-
-        mSaveEventViewModel = ViewModelProviders.of(this).get(SaveEventViewModel.class);
-
-        String eventId = (String) getArguments().get(ARG_EVENT_ID);
-        String groupId = (String) getArguments().get(ARG_GROUP_ID);
-
-        if (eventId != null) {
-            mSaveEventViewModel.init(EntityType.EVENT, eventId);
-            mUiState = UiState.VIEW_EVENT;
-            initEventObserver();
-        } else {
-            mSaveEventViewModel.init(EntityType.GROUP, groupId);
-            mUiState = UiState.NEW_EVENT;
-        }
-
-    }
 
     /**
      * Show's loading animation and initiates event listener if not already listening.
@@ -286,7 +303,6 @@ public class EventFragment extends LoadableFragment {
 
         // Starts the event listener if an existing event is being displayed and is not already being listened to
         if (!mSaveEventViewModel.isListening() && mUiState != UiState.NEW_EVENT) {
-            setLoading(true);
             mSaveEventViewModel.startListening();
         }
     }
@@ -304,15 +320,6 @@ public class EventFragment extends LoadableFragment {
         if (mSaveEventViewModel.isListening()) {
             mSaveEventViewModel.stopListening();
         }
-    }
-
-    /**
-     * Initialises the observation of the event document being listened to.
-     */
-    private void initEventObserver() {
-        mSaveEventViewModel.getEvent().observe(this, mEvent -> {
-            updateUi(mEvent);
-        });
     }
 
     /**
@@ -411,7 +418,8 @@ public class EventFragment extends LoadableFragment {
         mTitleEditText.setText(event.getTitle());
         mLocationEditText.setText(event.getLocation());
 
-        mDateAndTimeEditText.setText("Implement");
+        mDateEditText.setText(event.getDateToString());
+        mTimeEditText.setText(event.getTimeToString());
 
         if (!event.hasSetDate()) {
             Toast.makeText(getActivity(), "Implement submit availability button and inform user that it's date has not been decided yet.", Toast.LENGTH_LONG)
@@ -426,6 +434,34 @@ public class EventFragment extends LoadableFragment {
             mAttributeAdapter.notifyDataSetChanged();
         }
 
+    }
+
+    /**
+     * Initialises the observation of the event document being listened to.
+     */
+    private void initEventObserver() {
+        mSaveEventViewModel.getEvent().observe(this, mEvent -> {
+            updateUi(mEvent);
+        });
+    }
+
+    private class CopyFieldListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            if (mUiState != UiState.VIEW_EVENT) {
+                return;
+            }
+
+            EditText editText = (EditText) v;
+
+            final android.content.ClipboardManager clipboardManager = (ClipboardManager)getActivity().getSystemService(CLIPBOARD_SERVICE);
+            ClipData clipData = ClipData.newPlainText((String) editText.getTag(), editText.getText());
+            clipboardManager.setPrimaryClip(clipData);
+
+            Toast.makeText(getActivity(), editText.getTag() + " copied to clipboard.", Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 
     @Override
@@ -642,8 +678,6 @@ public class EventFragment extends LoadableFragment {
 
             mEditAttribute = itemView.findViewById(R.id.edit_attribute);
             mEditAttribute.setOnClickListener(this);
-
-            mAttributeValue.setOnClickListener(this);
         }
 
         @Override
@@ -672,12 +706,15 @@ public class EventFragment extends LoadableFragment {
             mAttributeTitle = itemView.findViewById(R.id.attribute_title);
             mAttributeValue = itemView.findViewById(R.id.attribute_value);
             mAttributeValue.setFocusable(false);
+
+            mAttributeValue.setOnClickListener(new CopyFieldListener());
         }
 
         void bind(ExtraAttribute attribute) {
             mAttribute = attribute;
             mAttributeTitle.setText(mAttribute.getTitle());
             mAttributeValue.setText(mAttribute.getValue());
+            mAttributeValue.setTag(mAttribute.getTitle());
         }
 
         ExtraAttribute getAttribute() {
